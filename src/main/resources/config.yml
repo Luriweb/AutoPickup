@@ -1,0 +1,3 @@
+AutoPickup:
+  # 이 플러그인의 기능을 활성화할 것인지 조정합니다
+  enablePlugin: True

@@ -1,0 +1,7 @@
+name: AutoPickup
+version: '${version}'
+main: com.github.luriel0228.autopickup.AutoPickup
+api-version: '1.20'
+permissions:
+    autopickup.pickup:
+        default: op
