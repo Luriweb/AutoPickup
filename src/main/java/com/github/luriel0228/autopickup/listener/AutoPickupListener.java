@@ -42,15 +42,15 @@ public class AutoPickupListener implements Listener {
     private void handleAutoSmelt(List<Item> dropItems, Block block) {
 
         Map<Material, Material> oreToIngotMap = new HashMap<>();
-        oreToIngotMap.put(Material.RAW_IRON, Material.IRON_INGOT);
-        oreToIngotMap.put(Material.RAW_GOLD, Material.GOLD_INGOT);
-        oreToIngotMap.put(Material.RAW_COPPER, Material.COPPER_INGOT);
+        oreToIngotMap.put(Material.RAW_IRON, Material.IRON_INGOT); // 철 원석
+        oreToIngotMap.put(Material.RAW_GOLD, Material.GOLD_INGOT); // 금 원석
+        oreToIngotMap.put(Material.RAW_COPPER, Material.COPPER_INGOT); // 구리 원석
 
-        oreToIngotMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK);
-        oreToIngotMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK);
-        oreToIngotMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK);
+        oreToIngotMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK); // 구리 원석 블록
+        oreToIngotMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK); // 철 원석 블록
+        oreToIngotMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK); // 금 원석 블록
 
-        oreToIngotMap.put(Material.ANCIENT_DEBRIS, Material.NETHERITE_SCRAP);
+        oreToIngotMap.put(Material.ANCIENT_DEBRIS, Material.NETHERITE_SCRAP); // 고대 잔해
 
         for (Item item : dropItems) {
             Material oreType = item.getItemStack().getType();
