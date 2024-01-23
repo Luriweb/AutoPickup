@@ -16,45 +16,80 @@ import java.util.Map;
 
 public class AutoPickupListener implements Listener {
 
+    private enum ItemType {
+        AUTO_SMELT("자동굽기"),
+        AUTO_PICKUP("자동줍기");
+
+        private final String lore;
+
+        ItemType(String lore) {
+            this.lore = lore;
+        }
+
+        public String getLore() {
+            return lore;
+        }
+    }
+
+    private final Map<Material, Material> oreToIngotMap = new HashMap<>();
+
+    public AutoPickupListener() {
+        oreToIngotMap.put(Material.RAW_IRON, Material.IRON_INGOT);
+        oreToIngotMap.put(Material.RAW_GOLD, Material.GOLD_INGOT);
+        oreToIngotMap.put(Material.RAW_COPPER, Material.COPPER_INGOT);
+        oreToIngotMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK);
+        oreToIngotMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK);
+        oreToIngotMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK);
+        oreToIngotMap.put(Material.ANCIENT_DEBRIS, Material.NETHERITE_SCRAP);
+    }
+
     @EventHandler
     public void handleBlockDropItemEvent(BlockDropItemEvent event) {
         Player player = event.getPlayer();
         List<Item> dropItems = event.getItems();
         Block block = event.getBlock();
 
-        if (player.getGameMode() == GameMode.CREATIVE) return;
-        if (dropItems.isEmpty()) return;
+        if (player.getGameMode() == GameMode.CREATIVE || dropItems.isEmpty()) {
+            return;
+        }
 
         ItemStack inv = player.getInventory().getItemInMainHand();
-        if (inv.getType() == Material.AIR || inv.getItemMeta() == null || inv.getItemMeta().getLore() == null) return;
+        if (inv.getType() == Material.AIR || inv.getItemMeta() == null || inv.getItemMeta().getLore() == null) {
+            return;
+        }
 
         List<String> itemLore = inv.getItemMeta().getLore();
 
-        if (itemLore.toString().contains("자동굽기")) {
+        if (itemLore.contains(ItemType.AUTO_SMELT.getLore()) && itemLore.contains(ItemType.AUTO_PICKUP.getLore())) {
+            event.setCancelled(true);
+            handleAutoSmeltPickup(player, dropItems, block);
+        } else if (itemLore.contains(ItemType.AUTO_SMELT.getLore())) {
             event.setCancelled(true);
             handleAutoSmelt(dropItems, block);
-        } else if (itemLore.toString().contains("자동줍기")) {
+        } else if (itemLore.contains(ItemType.AUTO_PICKUP.getLore())) {
             event.setCancelled(true);
             handleAutoPickup(player, dropItems);
         }
     }
 
-    private void handleAutoSmelt(List<Item> dropItems, Block block) {
-
-        Map<Material, Material> oreToIngotMap = new HashMap<>();
-        oreToIngotMap.put(Material.RAW_IRON, Material.IRON_INGOT); // 철 원석
-        oreToIngotMap.put(Material.RAW_GOLD, Material.GOLD_INGOT); // 금 원석
-        oreToIngotMap.put(Material.RAW_COPPER, Material.COPPER_INGOT); // 구리 원석
-
-        oreToIngotMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK); // 구리 원석 블록
-        oreToIngotMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK); // 철 원석 블록
-        oreToIngotMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK); // 금 원석 블록
-
-        oreToIngotMap.put(Material.ANCIENT_DEBRIS, Material.NETHERITE_SCRAP); // 고대 잔해
-
+    private void handleAutoSmeltPickup(Player player, List<Item> dropItems, Block block) {
         for (Item item : dropItems) {
             Material oreType = item.getItemStack().getType();
             Material ingotType = oreToIngotMap.get(oreType);
+
+            if (ingotType != null) {
+                player.getInventory().addItem(new ItemStack(ingotType, item.getItemStack().getAmount()));
+            } else {
+                player.getInventory().addItem(item.getItemStack());
+            }
+        }
+    }
+
+    private void handleAutoSmelt(List<Item> dropItems, Block block) {
+        for (Item item : dropItems) {
+            Material oreType = item.getItemStack().getType();
+            Material ingotType = oreToIngotMap.get(oreType);
+
             if (ingotType != null) {
                 spawnDroppedItem(block, ingotType, item.getItemStack().getAmount());
             }
@@ -71,5 +106,4 @@ public class AutoPickupListener implements Listener {
         ItemStack item = new ItemStack(material, amount);
         block.getWorld().dropItemNaturally(block.getLocation(), item);
     }
-
 }
