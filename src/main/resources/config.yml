@@ -1,3 +1,9 @@
 AutoPickup:
   # 이 플러그인의 기능을 활성화할 것인지 조정합니다
   enablePlugin: True
+
+  # 자동으로 굽기 위한 아이템 로어를 설정하세요
+  autosmeltLore: "자동굽기"
+
+  # 자동으로 줍기 위한 아이템 로어를 설정하세요
+  autopickupLore: "자동줍기"

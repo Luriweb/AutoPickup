@@ -1,10 +1,12 @@
 package com.github.luriel0228.autopickup.listener;
 
-import com.github.luriel0228.autopickup.handler.AutoPickupHandler;
-import com.github.luriel0228.autopickup.handler.AutoSmeltHandler;
+import com.github.luriel0228.autopickup.AutoPickup;
+import com.github.luriel0228.autopickup.handler.listener.AutoPickupHandler;
+import com.github.luriel0228.autopickup.handler.listener.AutoSmeltHandler;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +19,8 @@ import java.util.List;
 public class AutoPickupListener implements Listener {
 
     private enum ItemType {
-        AUTO_SMELT("자동굽기"),
-        AUTO_PICKUP("자동줍기");
+        AUTO_SMELT(AutoPickup.getInstance().config.getString("AutoPickup.autosmeltLore")),
+        AUTO_PICKUP(AutoPickup.getInstance().config.getString("AutoPickup.autopickupLore"));
 
         private final String lore;
 
@@ -54,7 +56,7 @@ public class AutoPickupListener implements Listener {
             return;
         }
 
-        List<String> itemLore = inv.getItemMeta().getLore();
+        String itemLore = inv.getItemMeta().getLore().toString();
 
         if (itemLore.contains(ItemType.AUTO_SMELT.getLore()) && itemLore.contains(ItemType.AUTO_PICKUP.getLore())) {
             event.setCancelled(true);

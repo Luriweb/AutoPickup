@@ -1,4 +1,4 @@
-package com.github.luriel0228.autopickup.handler;
+package com.github.luriel0228.autopickup.handler.listener;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
