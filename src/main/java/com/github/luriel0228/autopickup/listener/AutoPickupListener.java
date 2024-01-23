@@ -1,5 +1,7 @@
 package com.github.luriel0228.autopickup.listener;
 
+import com.github.luriel0228.autopickup.handler.AutoPickupHandler;
+import com.github.luriel0228.autopickup.handler.AutoSmeltHandler;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,9 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AutoPickupListener implements Listener {
 
@@ -31,16 +31,12 @@ public class AutoPickupListener implements Listener {
         }
     }
 
-    private final Map<Material, Material> oreToIngotMap = new HashMap<>();
+    private final AutoSmeltHandler autoSmeltHandler;
+    private final AutoPickupHandler autoPickupHandler;
 
     public AutoPickupListener() {
-        oreToIngotMap.put(Material.RAW_IRON, Material.IRON_INGOT);
-        oreToIngotMap.put(Material.RAW_GOLD, Material.GOLD_INGOT);
-        oreToIngotMap.put(Material.RAW_COPPER, Material.COPPER_INGOT);
-        oreToIngotMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK);
-        oreToIngotMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK);
-        oreToIngotMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK);
-        oreToIngotMap.put(Material.ANCIENT_DEBRIS, Material.NETHERITE_SCRAP);
+        this.autoSmeltHandler = AutoSmeltHandler.getInstance();
+        this.autoPickupHandler = AutoPickupHandler.getInstance();
     }
 
     @EventHandler
@@ -62,48 +58,13 @@ public class AutoPickupListener implements Listener {
 
         if (itemLore.contains(ItemType.AUTO_SMELT.getLore()) && itemLore.contains(ItemType.AUTO_PICKUP.getLore())) {
             event.setCancelled(true);
-            handleAutoSmeltPickup(player, dropItems, block);
+            autoSmeltHandler.handleAutoSmeltPickup(player, dropItems);
         } else if (itemLore.contains(ItemType.AUTO_SMELT.getLore())) {
             event.setCancelled(true);
-            handleAutoSmelt(dropItems, block);
+            autoSmeltHandler.handleAutoSmelt(dropItems, block);
         } else if (itemLore.contains(ItemType.AUTO_PICKUP.getLore())) {
             event.setCancelled(true);
-            handleAutoPickup(player, dropItems);
+            autoPickupHandler.handleAutoPickup(player, dropItems);
         }
-    }
-
-    private void handleAutoSmeltPickup(Player player, List<Item> dropItems, Block block) {
-        for (Item item : dropItems) {
-            Material oreType = item.getItemStack().getType();
-            Material ingotType = oreToIngotMap.get(oreType);
-
-            if (ingotType != null) {
-                player.getInventory().addItem(new ItemStack(ingotType, item.getItemStack().getAmount()));
-            } else {
-                player.getInventory().addItem(item.getItemStack());
-            }
-        }
-    }
-
-    private void handleAutoSmelt(List<Item> dropItems, Block block) {
-        for (Item item : dropItems) {
-            Material oreType = item.getItemStack().getType();
-            Material ingotType = oreToIngotMap.get(oreType);
-
-            if (ingotType != null) {
-                spawnDroppedItem(block, ingotType, item.getItemStack().getAmount());
-            }
-        }
-    }
-
-    private void handleAutoPickup(Player player, List<Item> dropItems) {
-        for (Item item : dropItems) {
-            player.getInventory().addItem(item.getItemStack());
-        }
-    }
-
-    private void spawnDroppedItem(Block block, Material material, int amount) {
-        ItemStack item = new ItemStack(material, amount);
-        block.getWorld().dropItemNaturally(block.getLocation(), item);
     }
 }
